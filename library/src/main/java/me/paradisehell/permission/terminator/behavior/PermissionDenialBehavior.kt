@@ -19,13 +19,37 @@ import androidx.fragment.app.FragmentActivity
 
 
 /**
+ * A [PermissionDenialBehavior] is designed to handle the result when at least a permission is
+ * denied, and which can be reused.
  *
  * @author Tao Cheng (tao@paradisehell.org)
  */
 interface PermissionDenialBehavior {
+    /**
+     * Called when at least a permission is denied, user who implements it must call
+     * [DenialRequest.cancel] or [DenialRequest.requestAgain]
+     *
+     * @param activity a [FragmentActivity]
+     * @param grantedPermissionList a lis of granted permissions
+     * @param deniedPermissionList a list of denied permissions
+     * @param request a [DenialRequest]
+     */
     fun onDenied(
         activity: FragmentActivity,
         grantedPermissionList: List<String>,
-        deniedPermissionList: List<String>
+        deniedPermissionList: List<String>,
+        request: DenialRequest
     )
+
+    /**
+     * A Factory to create [PermissionDenialBehavior]
+     */
+    interface Factory {
+        /**
+         * Create a instance of [PermissionDenialBehavior]
+         *
+         * @return a instance of [PermissionDenialBehavior]
+         */
+        fun create(): PermissionDenialBehavior
+    }
 }

@@ -16,28 +16,68 @@
 package me.paradisehell.permission.terminator.processor
 
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.fragment.app.Fragment
 
 
 /**
+ * A [PermissionProcessor] is used to request a permission and handle the result.
+ *
+ * @param I type of the input required to launch by [ActivityResultLauncher]
  *
  * @author Tao Cheng (tao@paradisehell.org)
  */
 interface PermissionProcessor<I> {
 
+    /**
+     * Create a [ActivityResultLauncher] to execute [ActivityResultContract]
+     *
+     * @param fragment a [Fragment] instance which needs to call [Fragment.registerForActivityResult]
+     * to create a [ActivityResultLauncher]
+     * @param callback a [Callback] to handle the result of requesting the permission given
+     *
+     * @return an [ActivityResultLauncher]
+     */
     fun createLauncher(fragment: Fragment, callback: Callback): ActivityResultLauncher<I>
 
+    /**
+     * Check whether current [PermissionProcessor] can handle the permission given
+     *
+     * @param permission a permission need to request
+     *
+     * @return `true` if current [PermissionProcessor] can handle the permission given, `false`
+     * otherwise
+     */
     fun canProcessPermission(permission: String): Boolean
 
-    fun requestPermission(launcher: ActivityResultLauncher<*>, permission: String)
+    fun requestPermission(launcher: ActivityResultLauncher<Any>, permission: String)
 
+    /**
+     * A [Callback] to handle the result of requesting a permission
+     */
     interface Callback {
+
+        /**
+         * Called when the permission given is granted
+         */
         fun onGranted()
 
+        /**
+         * Called when the permission given is denied
+         */
         fun onDenied()
     }
 
+    /**
+     * A [Factory] to create a [PermissionProcessor]
+     */
     interface Factory<I> {
+
+        /**
+         * Create a [PermissionProcessor]
+         *
+         * @return a [PermissionProcessor] instance
+         */
         fun create(): PermissionProcessor<I>
     }
 }

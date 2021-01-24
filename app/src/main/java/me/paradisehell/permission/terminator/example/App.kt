@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.paradisehell.permission.terminator.processor
+package me.paradisehell.permission.terminator.example
+
+import android.app.Application
 
 
 /**
  *
  * @author Tao Cheng (tao@paradisehell.org)
  */
-class AlwaysPermissionProcessorFactory : PermissionProcessor.Factory<String> {
-    override fun create(): PermissionProcessor<String> {
-        return AlwaysPermissionProcessor()
+class App : Application() {
+
+    override fun onCreate() {
+        super.onCreate()
     }
 }

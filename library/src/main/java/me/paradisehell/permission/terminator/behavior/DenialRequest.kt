@@ -15,16 +15,30 @@
  */
 package me.paradisehell.permission.terminator.behavior
 
-import androidx.fragment.app.FragmentActivity
+import me.paradisehell.permission.terminator.PermissionCallback
+import me.paradisehell.permission.terminator.request.PermissionRequest
 
 
 /**
+ * A [DenialRequest] is wrapper contains a [PermissionRequest]
  *
  * @author Tao Cheng (tao@paradisehell.org)
  */
-abstract class AbstractPermissionNeverAskBehavior : PermissionNeverAskBehavior {
+data class DenialRequest(
+    private val request: PermissionRequest
+) {
+    /**
+     * Called when user do not want to request permission again, which will invoke
+     * [PermissionCallback.onDenied]
+     */
+    fun cancel() {
+        request.callback.onDenied(request.grantedPermissionList, request.deniedPermissionList)
+    }
 
-    protected fun launchSettingActivity(activity: FragmentActivity) {
-
+    /**
+     * request permission again
+     */
+    fun requestAgain() {
+        request.request()
     }
 }

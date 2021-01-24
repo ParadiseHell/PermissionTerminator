@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat
 
 
 /**
+ * A Util to check permission
  *
  * @author Tao Cheng (tao@paradisehell.org)
  */

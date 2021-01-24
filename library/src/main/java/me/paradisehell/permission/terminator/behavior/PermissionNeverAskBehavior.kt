@@ -20,13 +20,32 @@ import androidx.fragment.app.FragmentActivity
 
 /**
  *
+ * A [PermissionNeverAskBehavior] is designed to handle the result when at least a permission is
+ * marked never asked again, and which can be reused.
+ *
  * @author Tao Cheng (tao@paradisehell.org)
  */
 interface PermissionNeverAskBehavior {
+
+    /**
+     * Called at least a permission is marked never asked
+     */
     fun onNeverAsk(
         activity: FragmentActivity,
         grantedPermissionList: List<String>,
         deniedPermissionList: List<String>,
         neverAskPermissionList: List<String>
     )
+
+    /**
+     * A Factory to create [PermissionNeverAskBehavior]
+     */
+    interface Factory {
+        /**
+         * Create a instance of [PermissionNeverAskBehavior]
+         *
+         * @return a instance of [PermissionNeverAskBehavior]
+         */
+        fun create(): PermissionNeverAskBehavior
+    }
 }

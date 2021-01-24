@@ -22,7 +22,10 @@ import android.content.ContextWrapper
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import me.paradisehell.permission.terminator.processor.AlwaysPermissionProcessorFactory
+import me.paradisehell.permission.terminator.behavior.PermissionDenialBehavior
+import me.paradisehell.permission.terminator.behavior.PermissionNeverAskBehavior
+import me.paradisehell.permission.terminator.behavior.PermissionRationalBehavior
+import me.paradisehell.permission.terminator.processor.FallbackPermissionProcessorFactory
 import me.paradisehell.permission.terminator.processor.PermissionProcessor
 import me.paradisehell.permission.terminator.request.PermissionRequestBuilder
 
@@ -83,7 +86,7 @@ class PermissionTerminator {
         // PermissionProcessorFactory
         private val defaultPermissionProcessorFactories =
             mutableListOf<PermissionProcessor.Factory<*>>(
-                AlwaysPermissionProcessorFactory()
+                FallbackPermissionProcessorFactory()
             )
 
         /**
@@ -113,6 +116,109 @@ class PermissionTerminator {
             factories.addAll(permissionProcessorFactories)
             factories.addAll(defaultPermissionProcessorFactories)
             return factories
+        }
+
+        // Behavior
+
+        // Rational
+
+        private val rationalFactories = mutableMapOf<Int, PermissionRationalBehavior.Factory>()
+        private var defaultRationalType: Int? = null
+
+        fun addRationalBehaviorFactory(
+            factoryType: Int,
+            factory: PermissionRationalBehavior.Factory
+        ) {
+            val oldFactory = rationalFactories[factoryType]
+            if (oldFactory != null) {
+                throw IllegalArgumentException(
+                    "Cannot add same type for different PermissionRationalBehavior.Factory " +
+                            "[${oldFactory::class.java} , ${factory::class.java}]"
+                )
+            }
+            rationalFactories[factoryType] = factory
+        }
+
+        fun setDefaultRationalBehaviorFactoryType(factoryType: Int) {
+            defaultRationalType = factoryType
+        }
+
+        internal fun getRationalBehavior(factoryType: Int?): PermissionRationalBehavior? {
+            val defaultType = defaultRationalType
+            if (factoryType == null) {
+                if (defaultType != null) {
+                    return rationalFactories[defaultType]?.create()
+                }
+            } else {
+                return rationalFactories[factoryType]?.create()
+            }
+            return null
+        }
+
+        // Denial
+        private val denialFactories = mutableMapOf<Int, PermissionDenialBehavior.Factory>()
+        private var defaultDenialType: Int? = null
+
+        fun addDenialBehaviorFactory(factoryType: Int, factory: PermissionDenialBehavior.Factory) {
+            val oldFactory = denialFactories[factoryType]
+            if (oldFactory != null) {
+                throw IllegalArgumentException(
+                    "Cannot add same factory type for PermissionDenialBehavior.Factory " +
+                            "[${oldFactory::class.java} , ${factory::class.java}]"
+                )
+            }
+            denialFactories[factoryType] = factory
+        }
+
+        fun setDefaultDenialBehaviorFactoryType(factoryType: Int) {
+            defaultDenialType = factoryType
+        }
+
+        internal fun getDenialBehavior(factoryType: Int?): PermissionDenialBehavior? {
+            val defaultType = defaultDenialType
+            if (factoryType == null) {
+                if (defaultType != null) {
+                    return denialFactories[defaultType]?.create()
+                }
+            } else {
+                return denialFactories[factoryType]?.create()
+            }
+            return null
+        }
+
+        // NeverAsk
+
+        private val neverAskFactories = mutableMapOf<Int, PermissionNeverAskBehavior.Factory>()
+        private var defaultNeverAskType: Int? = null
+
+        fun addDenialBehaviorFactory(
+            factoryType: Int,
+            factory: PermissionNeverAskBehavior.Factory
+        ) {
+            val oldFactory = neverAskFactories[factoryType]
+            if (oldFactory != null) {
+                throw IllegalArgumentException(
+                    "Cannot add same factory type for PermissionNeverAskBehavior.Factory " +
+                            "[${oldFactory::class.java} , ${factory::class.java}]"
+                )
+            }
+            neverAskFactories[factoryType] = factory
+        }
+
+        fun setDefaultNeverAskBehaviorFactoryType(factoryType: Int) {
+            defaultNeverAskType = factoryType
+        }
+
+        internal fun getNeverAskBehavior(factoryType: Int?): PermissionNeverAskBehavior? {
+            val defaultType = defaultNeverAskType
+            if (factoryType == null) {
+                if (defaultType != null) {
+                    return neverAskFactories[defaultType]?.create()
+                }
+            } else {
+                return neverAskFactories[factoryType]?.create()
+            }
+            return null
         }
     }
 }

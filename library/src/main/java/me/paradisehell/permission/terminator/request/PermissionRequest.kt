@@ -19,6 +19,10 @@ import androidx.fragment.app.FragmentActivity
 import me.paradisehell.permission.terminator.PermissionCallback
 import me.paradisehell.permission.terminator.PermissionFragment
 import me.paradisehell.permission.terminator.PermissionUtils
+import me.paradisehell.permission.terminator.behavior.PermissionDenialBehavior
+import me.paradisehell.permission.terminator.behavior.PermissionNeverAskBehavior
+import me.paradisehell.permission.terminator.behavior.PermissionRationalBehavior
+import me.paradisehell.permission.terminator.behavior.RationalRequest
 
 
 /**
@@ -26,32 +30,35 @@ import me.paradisehell.permission.terminator.PermissionUtils
  * @author Tao Cheng (tao@paradisehell.org)
  */
 @Suppress("ArrayInDataClass")
-internal data class PermissionRequest(
-    val activity: FragmentActivity,
-    val permissionList: List<String>,
-    val callback: PermissionCallback
+data class PermissionRequest(
+    internal val activity: FragmentActivity,
+    internal val permissionList: List<String>,
+    internal val rationalBehavior: PermissionRationalBehavior?,
+    internal val denialBehavior: PermissionDenialBehavior?,
+    internal val neverAskBehavior: PermissionNeverAskBehavior?,
+    internal val callback: PermissionCallback
 ) {
     /**
      * A flag to mark if this [PermissionRequest] is processing
      */
-    var isProcessing = false
+    internal var isProcessing = false
 
     /**
      * A list of permission which is granted
      */
-    val grantedPermissionList = mutableListOf<String>()
+    internal val grantedPermissionList = mutableListOf<String>()
 
     /**
      * A list of permission which is denied
      */
-    val deniedPermissionList = mutableListOf<String>()
+    internal val deniedPermissionList = mutableListOf<String>()
 
     /**
      * A list of permission which is never asked
      */
-    val neverAskPermissionList = mutableListOf<String>()
+    internal val neverAskPermissionList = mutableListOf<String>()
 
-    fun request() {
+    internal fun request() {
         // rest
         isProcessing = false
         grantedPermissionList.clear()
@@ -71,11 +78,14 @@ internal data class PermissionRequest(
             return
         }
         // check whether should show permission rational or not
-        val rationalPermissionList = deniedPermissionList.filter { permission ->
-            PermissionUtils.shouldShowRequestPermissionRationale(activity, permission)
-        }
-        if (rationalPermissionList.isNotEmpty()) {
-            // TODO show permission rational
+        if (rationalBehavior != null) {
+            val rationalPermissionList = deniedPermissionList.filter { permission ->
+                PermissionUtils.shouldShowRequestPermissionRationale(activity, permission)
+            }
+            if (rationalPermissionList.isNotEmpty()) {
+                rationalBehavior.explain(activity, rationalPermissionList, RationalRequest(this))
+                return
+            }
         }
         PermissionFragment.requestPermission(this)
     }

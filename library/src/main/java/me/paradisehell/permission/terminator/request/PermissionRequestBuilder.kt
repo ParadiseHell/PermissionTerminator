@@ -17,6 +17,7 @@ package me.paradisehell.permission.terminator.request
 
 import androidx.fragment.app.FragmentActivity
 import me.paradisehell.permission.terminator.PermissionCallback
+import me.paradisehell.permission.terminator.PermissionTerminator
 
 
 /**
@@ -24,7 +25,15 @@ import me.paradisehell.permission.terminator.PermissionCallback
  * @author Tao Cheng (tao@paradisehell.org)
  */
 class PermissionRequestBuilder(private val activity: FragmentActivity?) {
+
     private val permissionList = mutableListOf<String>()
+    private var rationalType: Int? = null
+    private var disableRational = false
+    private var denialType: Int? = null
+    private var disableDenial = false
+    private var neverAskType: Int? = null
+    private var disableNeverAsk = false
+    private lateinit var callback: PermissionCallback
 
     fun permissions(permission: String, vararg permissions: String) = apply {
         val permissionSet = mutableSetOf<String>()
@@ -38,18 +47,35 @@ class PermissionRequestBuilder(private val activity: FragmentActivity?) {
         }
     }
 
+    fun withRationalBehavior(rationalType: Int) = apply {
+        this.rationalType = rationalType
+    }
+
+    fun disableRationalBehavior() = apply {
+        disableRational = true
+    }
+
+    fun withDenialBehavior(denialType: Int) = apply {
+        this.denialType = denialType
+    }
+
+    fun disableDenialBehavior() = apply {
+        disableDenial = true
+    }
+
+    fun withNeverAskBehavior(neverAskType: Int) = apply {
+        this.neverAskType = neverAskType
+    }
+
+    fun disableNeverAskBehavior() = apply {
+        disableNeverAsk = true
+    }
+
+
     @Suppress("MemberVisibilityCanBePrivate")
     fun request(callback: PermissionCallback) {
-        if (activity == null) {
-            return
-        }
-        if (permissionList.isEmpty()) {
-            throw RuntimeException(
-                "Please call PermissionRequestBuilder#permisssions method fist !!!"
-            )
-        }
-        val request = PermissionRequest(activity, permissionList, callback)
-        request.request()
+        this.callback = callback
+        buildRequest()?.request()
     }
 
     fun request(
@@ -88,6 +114,35 @@ class PermissionRequestBuilder(private val activity: FragmentActivity?) {
                 )
             }
         })
+    }
+
+    private fun buildRequest(): PermissionRequest? {
+        if (activity == null) {
+            return null
+        }
+        // check permission
+        if (permissionList.isEmpty()) {
+            throw RuntimeException(
+                "Please call PermissionRequestBuilder#permisssions method fist !!!"
+            )
+        }
+        // check behavior
+        val rational = if (disableRational) {
+            null
+        } else {
+            PermissionTerminator.getRationalBehavior(rationalType)
+        }
+        val denial = if (disableDenial) {
+            null
+        } else {
+            PermissionTerminator.getDenialBehavior(denialType)
+        }
+        val neverAsk = if (disableNeverAsk) {
+            null
+        } else {
+            PermissionTerminator.getNeverAskBehavior(neverAskType)
+        }
+        return PermissionRequest(activity, permissionList, rational, denial, neverAsk, callback)
     }
 
     companion object {
