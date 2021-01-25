@@ -18,6 +18,9 @@ package me.paradisehell.permission.terminator.request
 import androidx.fragment.app.FragmentActivity
 import me.paradisehell.permission.terminator.PermissionCallback
 import me.paradisehell.permission.terminator.PermissionTerminator
+import me.paradisehell.permission.terminator.behavior.PermissionDenialBehavior
+import me.paradisehell.permission.terminator.behavior.PermissionNeverAskBehavior
+import me.paradisehell.permission.terminator.behavior.PermissionRationalBehavior
 import java.util.*
 
 
@@ -36,6 +39,12 @@ class PermissionRequestBuilder(private val activity: FragmentActivity?) {
     private var disableNeverAsk = false
     private lateinit var callback: PermissionCallback
 
+    /**
+     * Add permissions to this request
+     *
+     * @param permission a permissions
+     * @param permissions an array of permissions
+     */
     fun permissions(permission: String, vararg permissions: String) = apply {
         val permissionSet = mutableSetOf<String>()
         permissionList.add(permission)
@@ -48,37 +57,77 @@ class PermissionRequestBuilder(private val activity: FragmentActivity?) {
         }
     }
 
+    /**
+     * With a special [PermissionRationalBehavior]
+     *
+     * @param rationalType the type of [PermissionRationalBehavior]
+     */
     fun withRationalBehavior(rationalType: Int) = apply {
         this.rationalType = rationalType
     }
 
+    /**
+     * Disable to use [PermissionRationalBehavior]
+     */
     fun disableRationalBehavior() = apply {
         disableRational = true
     }
 
+    /**
+     * With a special [PermissionDenialBehavior]
+     *
+     * @param denialType the type of [PermissionDenialBehavior]
+     */
     fun withDenialBehavior(denialType: Int) = apply {
         this.denialType = denialType
     }
 
+    /**
+     * Disable to use [PermissionDenialBehavior]
+     */
     fun disableDenialBehavior() = apply {
         disableDenial = true
     }
 
+    /**
+     * With a special [PermissionNeverAskBehavior]
+     *
+     * @param neverAskType the type of [PermissionNeverAskBehavior]
+     */
     fun withNeverAskBehavior(neverAskType: Int) = apply {
         this.neverAskType = neverAskType
     }
 
+    /**
+     * Disable to use [PermissionNeverAskBehavior]
+     */
     fun disableNeverAskBehavior() = apply {
         disableNeverAsk = true
     }
 
 
+    /**
+     * Request permissions
+     *
+     * @param callback a [PermissionCallback] to listen result
+     */
     @Suppress("MemberVisibilityCanBePrivate")
     fun request(callback: PermissionCallback) {
         this.callback = callback
         buildRequest()?.request()
     }
 
+    /**
+     * Request permissions.
+     * Note that : [onDenied] and [onNeverAsked] have a default perform, because we support you
+     * to use [PermissionTerminator.setDefaultDenialBehaviorFactoryType] and
+     * [PermissionTerminator.setDefaultNeverAskBehaviorFactoryType] to set a default perform for
+     * these situations. So we can only focus on [onGranted] situation.
+     *
+     * @param onGranted called when all permissions are granted
+     * @param onDenied called when at least a permission is denied
+     * @param onNeverAsked called when at least a permission is never asked
+     */
     fun request(
         onGranted: (grantedPermissionList: List<String>) -> Unit,
         onDenied: (

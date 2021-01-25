@@ -33,6 +33,10 @@ class FallbackPermissionProcessorFactory : PermissionProcessor.Factory<String> {
         return FallbackPermissionProcessor()
     }
 
+    /**
+     * A [FallbackPermissionProcessor] is used to process permissions if there is no other
+     * [PermissionProcessor] can process permissions
+     */
     inner class FallbackPermissionProcessor : PermissionProcessor<String> {
 
         override fun createLauncher(
@@ -48,6 +52,9 @@ class FallbackPermissionProcessorFactory : PermissionProcessor.Factory<String> {
             }
         }
 
+        /**
+         * Always return `true`
+         */
         override fun canProcessPermission(permission: String) = true
 
         override fun requestPermission(
