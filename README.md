@@ -2,6 +2,28 @@
 
 A clean, comprehensive and scalable API to request Android Runtime permissions.
 
+## How to use
+
+```kotlin
+PermissionTerminator
+	.with(this /*View, Fragment or Actiivty*/ )
+	.permissions(
+		Manifest.permission.RECORD_AUDIO
+		// add more permissions
+	)
+	.request(
+		onGranted = { grantedPermissionList->
+			// called when all permissions are granted
+		},
+		onDenied = { grantedPermissionList, deniedPermissionList ->
+			// called when at least a permission is denied
+		},
+		onNeverAsked = { grantedPermissionList, deniedPermissionList, neverAskPermissionList ->
+			// called when at least a permission is never asked
+		}
+	)
+```
+
 ## License
 
 ```
