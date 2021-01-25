@@ -50,6 +50,12 @@ interface PermissionProcessor<I> {
      */
     fun canProcessPermission(permission: String): Boolean
 
+    /**
+     * Request the permission given
+     *
+     * @param launcher a [ActivityResultLauncher] which is used to process the permission given
+     * @param permission a permission
+     */
     fun requestPermission(launcher: ActivityResultLauncher<I>, permission: String)
 
     /**

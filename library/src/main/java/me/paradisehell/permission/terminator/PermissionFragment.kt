@@ -27,6 +27,7 @@ import java.util.*
 
 
 /**
+ * A [PermissionFragment] is used to request permission actually
  *
  * @author Tao Cheng (tao@paradisehell.org)
  */

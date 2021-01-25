@@ -27,6 +27,7 @@ import java.util.*
 
 
 /**
+ * A [PermissionRequest] contains all we need to request permissions
  *
  * @author Tao Cheng (tao@paradisehell.org)
  */
@@ -64,6 +65,9 @@ data class PermissionRequest(
      */
     internal val neverAskPermissionList = LinkedList<String>()
 
+    /**
+     * request permission actually
+     */
     internal fun request() {
         // rest
         isBeingProcessed = false
