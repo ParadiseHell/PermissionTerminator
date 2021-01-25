@@ -125,6 +125,14 @@ class PermissionTerminator {
         private val rationalFactories = mutableMapOf<Int, PermissionRationalBehavior.Factory>()
         private var defaultRationalType: Int? = null
 
+        /**
+         * Add a [PermissionRationalBehavior.Factory]
+         *
+         * @param factoryType the of [PermissionRationalBehavior.Factory]
+         * @param factory a instance of [PermissionRationalBehavior.Factory]
+         *
+         * @throws [IllegalArgumentException] when add a same [factoryType]
+         */
         fun addRationalBehaviorFactory(
             factoryType: Int,
             factory: PermissionRationalBehavior.Factory
@@ -139,10 +147,20 @@ class PermissionTerminator {
             rationalFactories[factoryType] = factory
         }
 
+        /**
+         * Set a default [PermissionRationalBehavior.Factory] to handle Rational situation
+         */
         fun setDefaultRationalBehaviorFactoryType(factoryType: Int) {
             defaultRationalType = factoryType
         }
 
+        /**
+         * Get a [PermissionRationalBehavior] by type
+         *
+         * @param factoryType the type of [PermissionRationalBehavior.Factory]
+         *
+         * @return a instance of [PermissionRationalBehavior]
+         */
         internal fun getRationalBehavior(factoryType: Int?): PermissionRationalBehavior? {
             val defaultType = defaultRationalType
             if (factoryType == null) {
@@ -159,6 +177,14 @@ class PermissionTerminator {
         private val denialFactories = mutableMapOf<Int, PermissionDenialBehavior.Factory>()
         private var defaultDenialType: Int? = null
 
+        /**
+         * Add a [PermissionDenialBehavior.Factory]
+         *
+         * @param factoryType the type of [PermissionDenialBehavior.Factory]
+         * @param factory a instance of [PermissionDenialBehavior.Factory]
+         *
+         * @throws [IllegalArgumentException] when add a same [factoryType]
+         */
         fun addDenialBehaviorFactory(factoryType: Int, factory: PermissionDenialBehavior.Factory) {
             val oldFactory = denialFactories[factoryType]
             if (oldFactory != null) {
@@ -170,10 +196,20 @@ class PermissionTerminator {
             denialFactories[factoryType] = factory
         }
 
+        /**
+         * Set a default [PermissionDenialBehavior.Factory] to handle Denial situation
+         */
         fun setDefaultDenialBehaviorFactoryType(factoryType: Int) {
             defaultDenialType = factoryType
         }
 
+        /**
+         * Get a [PermissionDenialBehavior] by type
+         *
+         * @param factoryType the type of [PermissionDenialBehavior.Factory]
+         *
+         * @return a instance of [PermissionDenialBehavior]
+         */
         internal fun getDenialBehavior(factoryType: Int?): PermissionDenialBehavior? {
             val defaultType = defaultDenialType
             if (factoryType == null) {
@@ -191,6 +227,14 @@ class PermissionTerminator {
         private val neverAskFactories = mutableMapOf<Int, PermissionNeverAskBehavior.Factory>()
         private var defaultNeverAskType: Int? = null
 
+        /**
+         * Add a [PermissionNeverAskBehavior.Factory]
+         *
+         * @param factoryType the type of [PermissionNeverAskBehavior.Factory]
+         * @param factory a instance of [PermissionNeverAskBehavior.Factory]
+         *
+         * @throws [IllegalArgumentException] when add a same [factoryType]
+         */
         fun addNeverAskBehaviorFactory(
             factoryType: Int,
             factory: PermissionNeverAskBehavior.Factory
@@ -205,10 +249,22 @@ class PermissionTerminator {
             neverAskFactories[factoryType] = factory
         }
 
+        /**
+         * Set a default [PermissionNeverAskBehavior.Factory] to handle NeverAsk situation
+         *
+         * @param factoryType the type of [PermissionNeverAskBehavior.Factory]
+         */
         fun setDefaultNeverAskBehaviorFactoryType(factoryType: Int) {
             defaultNeverAskType = factoryType
         }
 
+        /**
+         * Get a [PermissionNeverAskBehavior] by type
+         *
+         * @param factoryType the type of [PermissionNeverAskBehavior.Factory]
+         *
+         * @return a instance of [PermissionNeverAskBehavior]
+         */
         internal fun getNeverAskBehavior(factoryType: Int?): PermissionNeverAskBehavior? {
             val defaultType = defaultNeverAskType
             if (factoryType == null) {
