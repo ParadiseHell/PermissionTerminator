@@ -18,6 +18,7 @@ package me.paradisehell.permission.terminator.request
 import androidx.fragment.app.FragmentActivity
 import me.paradisehell.permission.terminator.PermissionCallback
 import me.paradisehell.permission.terminator.PermissionTerminator
+import java.util.*
 
 
 /**
@@ -26,7 +27,7 @@ import me.paradisehell.permission.terminator.PermissionTerminator
  */
 class PermissionRequestBuilder(private val activity: FragmentActivity?) {
 
-    private val permissionList = mutableListOf<String>()
+    private val permissionList = LinkedList<String>()
     private var rationalType: Int? = null
     private var disableRational = false
     private var denialType: Int? = null

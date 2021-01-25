@@ -51,7 +51,7 @@ class FallbackPermissionProcessorFactory : PermissionProcessor.Factory<String> {
         override fun canProcessPermission(permission: String) = true
 
         override fun requestPermission(
-            launcher: ActivityResultLauncher<Any>,
+            launcher: ActivityResultLauncher<String>,
             permission: String
         ) {
             launcher.launch(permission)

@@ -23,6 +23,7 @@ import me.paradisehell.permission.terminator.behavior.PermissionDenialBehavior
 import me.paradisehell.permission.terminator.behavior.PermissionNeverAskBehavior
 import me.paradisehell.permission.terminator.behavior.PermissionRationalBehavior
 import me.paradisehell.permission.terminator.behavior.RationalRequest
+import java.util.*
 
 
 /**
@@ -39,28 +40,33 @@ data class PermissionRequest(
     internal val callback: PermissionCallback
 ) {
     /**
-     * A flag to mark if this [PermissionRequest] is processing
+     * A flag to mark if this [PermissionRequest] is being processed
      */
-    internal var isProcessing = false
+    internal var isBeingProcessed = false
+
+    /**
+     * A flag to mark is this [PermissionRequest] is processing never ask again situation
+     */
+    internal var isNeverAsked = false
 
     /**
      * A list of permission which is granted
      */
-    internal val grantedPermissionList = mutableListOf<String>()
+    internal val grantedPermissionList = LinkedList<String>()
 
     /**
      * A list of permission which is denied
      */
-    internal val deniedPermissionList = mutableListOf<String>()
+    internal val deniedPermissionList = LinkedList<String>()
 
     /**
      * A list of permission which is never asked
      */
-    internal val neverAskPermissionList = mutableListOf<String>()
+    internal val neverAskPermissionList = LinkedList<String>()
 
     internal fun request() {
         // rest
-        isProcessing = false
+        isBeingProcessed = false
         grantedPermissionList.clear()
         deniedPermissionList.clear()
         neverAskPermissionList.clear()

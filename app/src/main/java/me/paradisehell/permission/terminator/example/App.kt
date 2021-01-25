@@ -16,6 +16,7 @@
 package me.paradisehell.permission.terminator.example
 
 import android.app.Application
+import me.paradisehell.permission.terminator.PermissionTerminator
 
 
 /**
@@ -26,5 +27,29 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // Rational
+        PermissionTerminator.addRationalBehaviorFactory(
+            DefaultPermissionRationalBehaviorFactory.TYPE,
+            DefaultPermissionRationalBehaviorFactory()
+        )
+        PermissionTerminator.setDefaultRationalBehaviorFactoryType(
+            DefaultPermissionRationalBehaviorFactory.TYPE
+        )
+        // Denial
+        PermissionTerminator.addDenialBehaviorFactory(
+            DefaultPermissionDenialBehaviorFactory.TYPE,
+            DefaultPermissionDenialBehaviorFactory()
+        )
+        PermissionTerminator.setDefaultDenialBehaviorFactoryType(
+            DefaultPermissionDenialBehaviorFactory.TYPE
+        )
+        // Never Ask
+        PermissionTerminator.addNeverAskBehaviorFactory(
+            DefaultPermissionNeverAskBehaviorFactory.TYPE,
+            DefaultPermissionNeverAskBehaviorFactory()
+        )
+        PermissionTerminator.setDefaultNeverAskBehaviorFactoryType(
+            DefaultPermissionNeverAskBehaviorFactory.TYPE
+        )
     }
 }

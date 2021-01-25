@@ -50,7 +50,7 @@ interface PermissionProcessor<I> {
      */
     fun canProcessPermission(permission: String): Boolean
 
-    fun requestPermission(launcher: ActivityResultLauncher<Any>, permission: String)
+    fun requestPermission(launcher: ActivityResultLauncher<I>, permission: String)
 
     /**
      * A [Callback] to handle the result of requesting a permission

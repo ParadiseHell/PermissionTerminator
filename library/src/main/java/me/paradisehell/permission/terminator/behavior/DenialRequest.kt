@@ -25,7 +25,9 @@ import me.paradisehell.permission.terminator.request.PermissionRequest
  * @author Tao Cheng (tao@paradisehell.org)
  */
 data class DenialRequest(
-    private val request: PermissionRequest
+    private val request: PermissionRequest,
+    private val onCancel: () -> Unit,
+    private val onRequestAgain: () -> Unit
 ) {
     /**
      * Called when user do not want to request permission again, which will invoke
@@ -33,12 +35,14 @@ data class DenialRequest(
      */
     fun cancel() {
         request.callback.onDenied(request.grantedPermissionList, request.deniedPermissionList)
+        onCancel.invoke()
     }
 
     /**
      * request permission again
      */
     fun requestAgain() {
+        onRequestAgain.invoke()
         request.request()
     }
 }

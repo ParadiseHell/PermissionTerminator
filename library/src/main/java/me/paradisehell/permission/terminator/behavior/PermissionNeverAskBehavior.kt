@@ -34,7 +34,8 @@ interface PermissionNeverAskBehavior {
         activity: FragmentActivity,
         grantedPermissionList: List<String>,
         deniedPermissionList: List<String>,
-        neverAskPermissionList: List<String>
+        neverAskPermissionList: List<String>,
+        request: NeverAskRequest
     )
 
     /**

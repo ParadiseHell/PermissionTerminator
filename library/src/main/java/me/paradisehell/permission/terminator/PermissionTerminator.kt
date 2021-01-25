@@ -191,7 +191,7 @@ class PermissionTerminator {
         private val neverAskFactories = mutableMapOf<Int, PermissionNeverAskBehavior.Factory>()
         private var defaultNeverAskType: Int? = null
 
-        fun addDenialBehaviorFactory(
+        fun addNeverAskBehaviorFactory(
             factoryType: Int,
             factory: PermissionNeverAskBehavior.Factory
         ) {

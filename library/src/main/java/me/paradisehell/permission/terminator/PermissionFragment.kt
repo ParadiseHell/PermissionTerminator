@@ -20,6 +20,7 @@ import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import me.paradisehell.permission.terminator.behavior.DenialRequest
+import me.paradisehell.permission.terminator.behavior.NeverAskRequest
 import me.paradisehell.permission.terminator.processor.PermissionProcessor
 import me.paradisehell.permission.terminator.request.PermissionRequest
 import java.util.*
@@ -37,26 +38,22 @@ internal class PermissionFragment : Fragment() {
     private val permissionRequestQueue = LinkedList<PermissionRequest>()
 
     /**
-     * The index of the permission list which is requesting
-     */
-    private var permissionIndex = -1
-
-    /**
      * A list of [PermissionProcessor] which to request permissions and handle the result, we can
      * also call this list `A Processor Chain`
      */
-    private val processors = mutableListOf<PermissionProcessor<out Any?>>()
+    private val processors = LinkedList<PermissionProcessor<Any>>()
 
     /**
      * A map of [ActivityResultLauncher] which can get easily by a [PermissionProcessor]
      */
     private val processorLauncherMap =
-        mutableMapOf<PermissionProcessor<out Any?>, ActivityResultLauncher<out Any>>()
+        mutableMapOf<PermissionProcessor<Any>, ActivityResultLauncher<Any>>()
 
     /**
-     * A flag to mark if this [PermissionFragment] can process [PermissionRequest]
+     * A flag to mark if this [PermissionFragment] can process [PermissionRequest] directly not
+     * to wait the lifecycle method
      */
-    private var canProcessPermissionRequestImmediately = false
+    private var canProcessRequestDirectly = false
 
     // Lifecycle
 
@@ -65,7 +62,8 @@ internal class PermissionFragment : Fragment() {
         // collect processors and launchers
         val factories = PermissionTerminator.getPermissionProcessorFactories()
         factories.forEach { factory ->
-            val processor = factory.create()
+            @Suppress("UNCHECKED_CAST")
+            val processor = factory.create() as PermissionProcessor<Any>
             processors.add(processor)
             processorLauncherMap[processor] = processor.createLauncher(
                 this, PermissionResultCallback()
@@ -75,13 +73,13 @@ internal class PermissionFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        canProcessPermissionRequestImmediately = true
+        canProcessRequestDirectly = true
         processNextPermissionRequest()
     }
 
     override fun onPause() {
         super.onPause()
-        canProcessPermissionRequestImmediately = false
+        canProcessRequestDirectly = false
     }
 
     override fun onDestroy() {
@@ -96,34 +94,91 @@ internal class PermissionFragment : Fragment() {
     // private methods
 
     /**
-     * Peek a [PermissionRequest] from [PermissionFragment.permissionRequestQueue] and handle it
+     * Peek a [PermissionRequest] from [PermissionFragment.permissionRequestQueue] and process it
+     *
+     * @param removeFirst whether remove first [PermissionRequest] in the queue
      */
-    private fun processNextPermissionRequest() {
+    private fun processNextPermissionRequest(removeFirst: Boolean = false) {
+        // check removeFirst
+        if (removeFirst && permissionRequestQueue.isNotEmpty()) {
+            permissionRequestQueue.removeFirst()
+        }
         val currentRequest = permissionRequestQueue.peek() ?: return
-        if (currentRequest.isProcessing) {
+        if (currentRequest.isBeingProcessed) {
+            handlePermissionRequestWithNeverAsk(currentRequest)
             return
         }
-        currentRequest.isProcessing = true
-        // rest permission index
-        permissionIndex = 0
+        currentRequest.isBeingProcessed = true
         requestPermissionWithProcessorChain()
+    }
+
+    /**
+     * handle a [PermissionRequest] when user choose `Never Ask gain` and launch SettingActivity
+     * and back again
+     */
+    private fun handlePermissionRequestWithNeverAsk(request: PermissionRequest) {
+        if (request.isNeverAsked.not()) {
+            return
+        }
+        request.isNeverAsked = false
+        if (request.neverAskPermissionList.isEmpty()) {
+            return
+        }
+        // check if permission is granted
+        val neverAskPermission = request.neverAskPermissionList.first()
+        if (PermissionUtils.isPermissionGranted(requireContext(), neverAskPermission).not()) {
+            // check if permission is still never ask
+            if (PermissionUtils.shouldShowRequestPermissionRationale(
+                    requireActivity(),
+                    neverAskPermission
+                )
+            ) {
+                // just denied
+                request.neverAskPermissionList.removeFirst()
+                request.deniedPermissionList.addLast(neverAskPermission)
+                request.callback.onDenied(
+                    request.grantedPermissionList,
+                    request.deniedPermissionList
+                )
+            } else {
+                // still Never Ask Again
+                request.callback.onNeverAsked(
+                    request.grantedPermissionList,
+                    request.deniedPermissionList,
+                    request.neverAskPermissionList
+                )
+            }
+            // process next PermissionRequest
+            processNextPermissionRequest(true)
+            return
+        }
+        // permission is granted
+        request.neverAskPermissionList.removeFirst()
+        request.grantedPermissionList.add(neverAskPermission)
+        if (request.grantedPermissionList.size == request.permissionList.size) {
+            request.callback.onGranted(request.grantedPermissionList)
+            // process next PermissionRequest
+            processNextPermissionRequest(true)
+            return
+        } else {
+            requestPermissionWithProcessorChain()
+        }
     }
 
     /**
      * request permissions by [PermissionFragment.processors]
      */
     private fun requestPermissionWithProcessorChain() {
-        if (canHandleCurrentPermissionRequest().not()) {
+        if (canProcessCurrentPermissionRequest().not()) {
             return
         }
         val currentRequest = permissionRequestQueue.peek()!!
-        val permission = currentRequest.deniedPermissionList[permissionIndex]
+        val permission = currentRequest.deniedPermissionList.first
         run {
             processors.forEach { processor ->
                 if (processor.canProcessPermission(permission)) {
                     val launcher = processorLauncherMap[processor]!!
-                    @Suppress("UNCHECKED_CAST")
-                    processor.requestPermission(launcher as ActivityResultLauncher<Any>, permission)
+                    processor.requestPermission(launcher, permission)
                     return@run
                 }
             }
@@ -131,17 +186,16 @@ internal class PermissionFragment : Fragment() {
     }
 
     /**
-     * Check whether we can handle current [PermissionRequest] or not, we have something to do
+     * Check whether we can process current [PermissionRequest] or not, we have something to do
      * below :
      *
      * 1. if current [PermissionFragment] is recycled, we can not handle current [PermissionRequest]
      * 2. if current [PermissionRequest] is null, we can not handle current [PermissionRequest]
      * 3. if current [PermissionRequest] is not in processing, we can not handle current
      * [PermissionRequest]
-     * 4. if [PermissionFragment.permissionIndex] is out of range, we can not handle current
-     * [PermissionRequest]
+     * 4. if current [PermissionRequest] has denied permission needed to request
      */
-    private fun canHandleCurrentPermissionRequest(): Boolean {
+    private fun canProcessCurrentPermissionRequest(): Boolean {
         // 1. check if current PermissionFragment is recycled
         if (activity == null) {
             return false
@@ -149,13 +203,11 @@ internal class PermissionFragment : Fragment() {
         // 2. check if current PermissionRequest is null
         val currentRequest = permissionRequestQueue.peek() ?: return false
         // 3. check if current PermissionRequest is in processing
-        if (currentRequest.isProcessing.not()) {
+        if (currentRequest.isBeingProcessed.not()) {
             return false
         }
-        // 4. check if the permissionIndex is out of range
-        if (permissionIndex < 0 || permissionIndex >= currentRequest.deniedPermissionList.size) {
-            return false
-        }
+        // 4. check if there is a denied permission need to request
+        currentRequest.deniedPermissionList.peek() ?: return false
         return true
     }
 
@@ -164,78 +216,93 @@ internal class PermissionFragment : Fragment() {
      */
     inner class PermissionResultCallback : PermissionProcessor.Callback {
         override fun onGranted() {
-            if (canHandleCurrentPermissionRequest().not()) {
+            if (canProcessCurrentPermissionRequest().not()) {
                 return
             }
             // get current PermissionRequest and current permission
             val currentRequest = permissionRequestQueue.peek()!!
-            val permission = currentRequest.deniedPermissionList[permissionIndex]
+            val permission = currentRequest.deniedPermissionList.removeFirst()
             currentRequest.grantedPermissionList.add(permission)
             // check if grantedPermissionList's size is equal permissionList
             if (currentRequest.permissionList.size == currentRequest.grantedPermissionList.size) {
                 // invoke granted callback
                 currentRequest.callback.onGranted(currentRequest.grantedPermissionList)
                 // process next PermissionRequest
-                permissionRequestQueue.removeFirst()
-                processNextPermissionRequest()
+                processNextPermissionRequest(true)
                 return
             }
             // process the next permission of current PermissionRequest
-            permissionIndex++
             requestPermissionWithProcessorChain()
         }
 
         override fun onDenied() {
-            if (canHandleCurrentPermissionRequest().not()) {
+            if (canProcessCurrentPermissionRequest().not()) {
                 return
             }
             // get current PermissionRequest and current permission
             val currentRequest = permissionRequestQueue.peek()!!
-            val permission = currentRequest.deniedPermissionList[permissionIndex]
-            // check whether the permission is marked never ask again
-            if (PermissionUtils.shouldShowRequestPermissionRationale(
-                    requireActivity(), permission
-                )
-            ) {
-                // permission is just denied
-
+            val permission = currentRequest.deniedPermissionList.first
+            // check whether the permission is just denied not never ask again
+            val justDenied = PermissionUtils.shouldShowRequestPermissionRationale(
+                requireActivity(), permission
+            )
+            if (justDenied) {
                 // check whether PermissionDenialBehavior is exist or not, if so invoke it
                 if (currentRequest.denialBehavior != null) {
                     currentRequest.denialBehavior.onDenied(
                         requireActivity(),
                         currentRequest.grantedPermissionList,
                         currentRequest.deniedPermissionList,
-                        DenialRequest(currentRequest)
+                        DenialRequest(
+                            currentRequest,
+                            onCancel = {
+                                processNextPermissionRequest(true)
+                            },
+                            onRequestAgain = {
+                                if (permissionRequestQueue.isNotEmpty()) {
+                                    permissionRequestQueue.removeFirst()
+                                }
+                            }
+                        )
                     )
-                } else {
-                    // invoke denied callback
-                    currentRequest.callback.onDenied(
-                        currentRequest.grantedPermissionList,
-                        currentRequest.deniedPermissionList
-                    )
+                    return
                 }
-            } else {
-                // permission is marked never ask again
-                currentRequest.neverAskPermissionList.add(permission)
-                // invoke neverAsked callback
-                currentRequest.callback.onNeverAsked(
+                // invoke denied callback
+                currentRequest.callback.onDenied(
+                    currentRequest.grantedPermissionList,
+                    currentRequest.deniedPermissionList
+                )
+                // process next PermissionRequest
+                processNextPermissionRequest(true)
+                return
+            }
+            // Never Ask Again
+            currentRequest.neverAskPermissionList.add(permission)
+            currentRequest.deniedPermissionList.removeFirst()
+            // check whether PermissionNeverAskBehavior is exist or not, if so invoke it
+            if (currentRequest.neverAskBehavior != null) {
+                currentRequest.neverAskBehavior.onNeverAsk(
+                    requireActivity(),
                     currentRequest.grantedPermissionList,
                     currentRequest.deniedPermissionList,
-                    currentRequest.neverAskPermissionList
-                )
-                // check whether PermissionNeverAskBehavior is exist or not, if so invoke it
-                if (currentRequest.neverAskBehavior != null) {
-                    currentRequest.neverAskBehavior.onNeverAsk(
-                        requireActivity(),
-                        currentRequest.grantedPermissionList,
-                        currentRequest.deniedPermissionList,
-                        currentRequest.neverAskPermissionList
+                    currentRequest.neverAskPermissionList,
+                    NeverAskRequest(
+                        currentRequest,
+                        onCancel = {
+                            processNextPermissionRequest(true)
+                        }
                     )
-                }
+                )
+                return
             }
+            // invoke neverAsked callback
+            currentRequest.callback.onNeverAsked(
+                currentRequest.grantedPermissionList,
+                currentRequest.deniedPermissionList,
+                currentRequest.neverAskPermissionList
+            )
             // process next PermissionRequest
-            permissionRequestQueue.removeFirst()
-            processNextPermissionRequest()
+            processNextPermissionRequest(true)
         }
     }
 
@@ -264,10 +331,10 @@ internal class PermissionFragment : Fragment() {
                 }
                 // add the PermissionRequest to the queue
                 fragment.permissionRequestQueue.add(request)
-                // check whether this PermissionFragment can process PermissionRequest immediately,
+                // check whether this PermissionFragment can process PermissionRequest directly,
                 // if not waiting the lifecycle methods to be called to handle permissions,
-                // otherwise process the PermissionRequest immediately
-                if (fragment.canProcessPermissionRequestImmediately) {
+                // otherwise process the PermissionRequest directly
+                if (fragment.canProcessRequestDirectly) {
                     fragment.processNextPermissionRequest()
                 }
             }
