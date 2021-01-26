@@ -15,6 +15,7 @@
  */
 package me.paradisehell.permission.terminator
 
+import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.Manifest.permission.SYSTEM_ALERT_WINDOW
 import android.app.Activity
 import android.content.Context
@@ -42,8 +43,17 @@ internal class PermissionUtils {
         fun isPermissionGranted(context: Context, permission: String): Boolean {
             when (permission) {
                 SYSTEM_ALERT_WINDOW -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        return Settings.canDrawOverlays(context)
+                    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        Settings.canDrawOverlays(context)
+                    } else {
+                        true
+                    }
+                }
+                REQUEST_INSTALL_PACKAGES -> {
+                    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.packageManager.canRequestPackageInstalls()
+                    } else {
+                        true
                     }
                 }
             }
@@ -66,7 +76,8 @@ internal class PermissionUtils {
         ): Boolean {
             // check special permission first
             when (permission) {
-                SYSTEM_ALERT_WINDOW -> {
+                SYSTEM_ALERT_WINDOW,
+                REQUEST_INSTALL_PACKAGES -> {
                     return true
                 }
             }
