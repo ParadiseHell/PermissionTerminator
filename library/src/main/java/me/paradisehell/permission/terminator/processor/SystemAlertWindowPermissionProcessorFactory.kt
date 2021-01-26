@@ -17,13 +17,11 @@ package me.paradisehell.permission.terminator.processor
 
 import android.Manifest.permission.SYSTEM_ALERT_WINDOW
 import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.provider.Settings
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import me.paradisehell.permission.terminator.IntentUtils
 import me.paradisehell.permission.terminator.PermissionUtils
 
 
@@ -32,7 +30,7 @@ import me.paradisehell.permission.terminator.PermissionUtils
  *
  * @author Tao Cheng (tao@paradisehell.org)
  */
-class OverlayPermissionProcessorFactory : PermissionProcessor.Factory<Intent> {
+class SystemAlertWindowPermissionProcessorFactory : PermissionProcessor.Factory<Intent> {
 
     override fun create() = OverlayPermissionProcessor()
 
@@ -67,21 +65,7 @@ class OverlayPermissionProcessorFactory : PermissionProcessor.Factory<Intent> {
             launcher: ActivityResultLauncher<Intent>,
             permission: String
         ) {
-            var intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                Intent(
-                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:${activity.packageName}")
-                )
-            } else {
-                Intent(
-                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                    Uri.parse("package:${activity.packageName}")
-                )
-            }
-            if (intent.resolveActivity(activity.packageManager) == null) {
-                intent = Intent(Settings.ACTION_SETTINGS)
-            }
-            launcher.launch(intent)
+            launcher.launch(IntentUtils.getPermissionIntent(activity, SYSTEM_ALERT_WINDOW))
         }
     }
 }

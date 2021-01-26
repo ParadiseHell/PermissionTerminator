@@ -16,6 +16,7 @@
 package me.paradisehell.permission.terminator
 
 import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
+import android.Manifest.permission.SYSTEM_ALERT_WINDOW
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -36,6 +37,14 @@ internal class IntentUtils {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         intent = Intent(
                             Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                            Uri.parse("package:${context.packageName}")
+                        )
+                    }
+                }
+                SYSTEM_ALERT_WINDOW -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        Intent(
+                            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                             Uri.parse("package:${context.packageName}")
                         )
                     }
