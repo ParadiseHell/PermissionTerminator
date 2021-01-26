@@ -15,16 +15,19 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.button_audio).setOnClickListener {
             PermissionTerminator
                 .with(this)
-                .permissions(Manifest.permission.RECORD_AUDIO)
+                .permissions(
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.SYSTEM_ALERT_WINDOW
+                )
                 .request(
                     onGranted = {
-                        Toast.makeText(this, "RECORD_AUDIO Granted", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Granted", Toast.LENGTH_SHORT).show()
                     },
                     onDenied = { _, _ ->
-                        Toast.makeText(this, "RECORD_AUDIO Denied", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Denied", Toast.LENGTH_SHORT).show()
                     },
                     onNeverAsked = { _, _, _ ->
-                        Toast.makeText(this, "RECORD_AUDIO NeverAsk", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "NeverAsk", Toast.LENGTH_SHORT).show()
                     }
                 )
         }

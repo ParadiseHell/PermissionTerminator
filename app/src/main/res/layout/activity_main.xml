@@ -3,28 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".example.MainActivity">
+    android:orientation="vertical">
 
-    <LinearLayout
+    <Button
+        android:id="@+id/button_audio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        tools:ignore="UselessParent">
-
-        <Button
-            android:id="@+id/button_audio"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Audio"
-            android:textAllCaps="false"
-            tools:ignore="ButtonStyle,HardcodedText" />
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            tools:ignore="ButtonStyle" />
-    </LinearLayout>
+        android:text="Audio, AlertWindow"
+        android:textAllCaps="false"
+        tools:ignore="ButtonStyle,HardcodedText" />
 </LinearLayout>

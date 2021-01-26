@@ -53,19 +53,14 @@ data class NeverAskRequest(
         request.isNeverAsked = true
         // check if can launch application detail setting activity
         val context = request.activity
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        val uri = Uri.fromParts(
-            "package", context.packageName, null
+        var intent = Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.parse("package:${context.packageName}")
         )
-        intent.data = uri
-        if (intent.resolveActivity(context.packageManager) != null) {
-            context.startActivity(intent)
-        } else {
-            // just launch setting activity
-            val settingIntent = Intent(Settings.ACTION_SETTINGS)
-            if (settingIntent.resolveActivity(context.packageManager) != null) {
-                context.startActivity(settingIntent)
-            }
+        if (intent.resolveActivity(context.packageManager) == null) {
+            // just launch SettingActivity
+            intent = Intent(Settings.ACTION_SETTINGS)
         }
+        context.startActivity(intent)
     }
 }

@@ -18,6 +18,7 @@ package me.paradisehell.permission.terminator.processor
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 
 
 /**
@@ -53,10 +54,15 @@ interface PermissionProcessor<I> {
     /**
      * Request the permission given
      *
+     * @param activity a [FragmentActivity]
      * @param launcher a [ActivityResultLauncher] which is used to process the permission given
      * @param permission a permission
      */
-    fun requestPermission(launcher: ActivityResultLauncher<I>, permission: String)
+    fun requestPermission(
+        activity: FragmentActivity,
+        launcher: ActivityResultLauncher<I>,
+        permission: String
+    )
 
     /**
      * A [Callback] to handle the result of requesting a permission
