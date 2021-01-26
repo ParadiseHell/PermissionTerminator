@@ -15,9 +15,10 @@
  */
 package me.paradisehell.permission.terminator.processor
 
-import android.Manifest
+import android.Manifest.permission.SYSTEM_ALERT_WINDOW
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,6 +28,7 @@ import me.paradisehell.permission.terminator.PermissionUtils
 
 
 /**
+ * Use to handle [SYSTEM_ALERT_WINDOW] permission
  *
  * @author Tao Cheng (tao@paradisehell.org)
  */
@@ -42,12 +44,13 @@ class OverlayPermissionProcessorFactory : PermissionProcessor.Factory<Intent> {
             return fragment.registerForActivityResult(
                 ActivityResultContracts.StartActivityForResult()
             ) {
+                // Do not need to check ActivityResult, Because it may get a Activity.RESULT_CANCEL
+                // resultCode
+
+                // Check if fragment is recycled
                 val activity = fragment.activity ?: return@registerForActivityResult
-                if (PermissionUtils.isPermissionGranted(
-                        activity,
-                        Manifest.permission.SYSTEM_ALERT_WINDOW
-                    )
-                ) {
+                // just check whether permission is granted or not
+                if (PermissionUtils.isPermissionGranted(activity, SYSTEM_ALERT_WINDOW)) {
                     callback.onGranted()
                 } else {
                     callback.onDenied()
@@ -56,7 +59,7 @@ class OverlayPermissionProcessorFactory : PermissionProcessor.Factory<Intent> {
         }
 
         override fun canProcessPermission(permission: String): Boolean {
-            return permission == Manifest.permission.SYSTEM_ALERT_WINDOW
+            return permission == SYSTEM_ALERT_WINDOW
         }
 
         override fun requestPermission(
@@ -64,7 +67,7 @@ class OverlayPermissionProcessorFactory : PermissionProcessor.Factory<Intent> {
             launcher: ActivityResultLauncher<Intent>,
             permission: String
         ) {
-            var intent = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            var intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 Intent(
                     Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:${activity.packageName}")
@@ -72,9 +75,7 @@ class OverlayPermissionProcessorFactory : PermissionProcessor.Factory<Intent> {
             } else {
                 Intent(
                     Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                    Uri.fromParts(
-                        "package", activity.packageName, null
-                    )
+                    Uri.parse("package:${activity.packageName}")
                 )
             }
             if (intent.resolveActivity(activity.packageManager) == null) {

@@ -15,10 +15,11 @@
  */
 package me.paradisehell.permission.terminator
 
-import android.Manifest
+import android.Manifest.permission.SYSTEM_ALERT_WINDOW
 import android.app.Activity
 import android.content.Context
-import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.os.Build
 import android.provider.Settings
 import androidx.core.content.ContextCompat
 
@@ -39,18 +40,14 @@ internal class PermissionUtils {
          * @return `true` if the permission is granted, `false` otherwise
          */
         fun isPermissionGranted(context: Context, permission: String): Boolean {
-            val granted = ContextCompat.checkSelfPermission(
-                context, permission
-            ) == PackageManager.PERMISSION_GRANTED
-            if (granted.not()) {
-                if (permission == Manifest.permission.SYSTEM_ALERT_WINDOW && Settings.canDrawOverlays(
-                        context
-                    )
-                ) {
-                    return true
+            when (permission) {
+                SYSTEM_ALERT_WINDOW -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        return Settings.canDrawOverlays(context)
+                    }
                 }
             }
-            return granted
+            return ContextCompat.checkSelfPermission(context, permission) == PERMISSION_GRANTED
         }
 
         /**
@@ -67,10 +64,13 @@ internal class PermissionUtils {
             activity: Activity,
             permission: String
         ): Boolean {
-            if (permission == Manifest.permission.SYSTEM_ALERT_WINDOW) {
-                return true
+            // check special permission first
+            when (permission) {
+                SYSTEM_ALERT_WINDOW -> {
+                    return true
+                }
             }
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 return activity.shouldShowRequestPermissionRationale(permission)
             }
             return true
