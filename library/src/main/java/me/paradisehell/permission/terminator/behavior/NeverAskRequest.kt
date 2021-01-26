@@ -15,9 +15,7 @@
  */
 package me.paradisehell.permission.terminator.behavior
 
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
+import me.paradisehell.permission.terminator.IntentUtils
 import me.paradisehell.permission.terminator.PermissionCallback
 import me.paradisehell.permission.terminator.request.PermissionRequest
 
@@ -51,16 +49,7 @@ data class NeverAskRequest(
     fun launchSettingActivity() {
         // mark never ask
         request.isNeverAsked = true
-        // check if can launch application detail setting activity
-        val context = request.activity
-        var intent = Intent(
-            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-            Uri.parse("package:${context.packageName}")
-        )
-        if (intent.resolveActivity(context.packageManager) == null) {
-            // just launch SettingActivity
-            intent = Intent(Settings.ACTION_SETTINGS)
-        }
-        context.startActivity(intent)
+        // start activity
+        request.activity.startActivity(IntentUtils.getApplicationSettingIntent(request.activity))
     }
 }
