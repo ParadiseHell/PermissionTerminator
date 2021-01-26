@@ -18,6 +18,7 @@ package me.paradisehell.permission.terminator.processor
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import me.paradisehell.permission.terminator.processor.FallbackPermissionProcessorFactory.FallbackPermissionProcessor
 
 
@@ -58,6 +59,7 @@ class FallbackPermissionProcessorFactory : PermissionProcessor.Factory<String> {
         override fun canProcessPermission(permission: String) = true
 
         override fun requestPermission(
+            activity: FragmentActivity,
             launcher: ActivityResultLauncher<String>,
             permission: String
         ) {

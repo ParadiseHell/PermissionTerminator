@@ -15,9 +15,11 @@
  */
 package me.paradisehell.permission.terminator
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.provider.Settings
 import androidx.core.content.ContextCompat
 
 
@@ -37,9 +39,18 @@ internal class PermissionUtils {
          * @return `true` if the permission is granted, `false` otherwise
          */
         fun isPermissionGranted(context: Context, permission: String): Boolean {
-            return ContextCompat.checkSelfPermission(
+            val granted = ContextCompat.checkSelfPermission(
                 context, permission
             ) == PackageManager.PERMISSION_GRANTED
+            if (granted.not()) {
+                if (permission == Manifest.permission.SYSTEM_ALERT_WINDOW && Settings.canDrawOverlays(
+                        context
+                    )
+                ) {
+                    return true
+                }
+            }
+            return granted
         }
 
         /**
@@ -56,6 +67,9 @@ internal class PermissionUtils {
             activity: Activity,
             permission: String
         ): Boolean {
+            if (permission == Manifest.permission.SYSTEM_ALERT_WINDOW) {
+                return true
+            }
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 return activity.shouldShowRequestPermissionRationale(permission)
             }

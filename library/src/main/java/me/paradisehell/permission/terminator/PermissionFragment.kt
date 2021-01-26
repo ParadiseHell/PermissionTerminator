@@ -179,7 +179,7 @@ internal class PermissionFragment : Fragment() {
             processors.forEach { processor ->
                 if (processor.canProcessPermission(permission)) {
                     val launcher = processorLauncherMap[processor]!!
-                    processor.requestPermission(launcher, permission)
+                    processor.requestPermission(requireActivity(), launcher, permission)
                     return@run
                 }
             }
