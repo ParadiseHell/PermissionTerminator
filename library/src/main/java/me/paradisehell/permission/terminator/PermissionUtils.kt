@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
+import android.os.Environment
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -66,6 +67,11 @@ internal class PermissionUtils {
                         true
                     }
                 }
+                MANAGE_EXTERNAL_STORAGE -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        return Environment.isExternalStorageManager()
+                    }
+                }
             }
             return ContextCompat.checkSelfPermission(context, permission) == PERMISSION_GRANTED
         }
@@ -89,7 +95,8 @@ internal class PermissionUtils {
                 SYSTEM_ALERT_WINDOW,
                 REQUEST_INSTALL_PACKAGES,
                 ACCESS_NOTIFICATION_POLICY,
-                WRITE_SETTINGS -> {
+                WRITE_SETTINGS,
+                MANAGE_EXTERNAL_STORAGE -> {
                     return true
                 }
             }

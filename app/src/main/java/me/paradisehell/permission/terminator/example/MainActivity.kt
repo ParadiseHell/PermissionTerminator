@@ -23,7 +23,8 @@ class MainActivity : AppCompatActivity() {
                     Manifest.permission.SYSTEM_ALERT_WINDOW,
                     Manifest.permission.REQUEST_INSTALL_PACKAGES,
                     Manifest.permission.ACCESS_NOTIFICATION_POLICY,
-                    Manifest.permission.WRITE_SETTINGS
+                    Manifest.permission.WRITE_SETTINGS,
+                    Manifest.permission.MANAGE_EXTERNAL_STORAGE,
                 )
                 .request(
                     onGranted = {
