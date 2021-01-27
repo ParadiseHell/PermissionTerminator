@@ -25,10 +25,7 @@ import androidx.fragment.app.FragmentActivity
 import me.paradisehell.permission.terminator.behavior.PermissionDenialBehavior
 import me.paradisehell.permission.terminator.behavior.PermissionNeverAskBehavior
 import me.paradisehell.permission.terminator.behavior.PermissionRationalBehavior
-import me.paradisehell.permission.terminator.processor.FallbackPermissionProcessorFactory
-import me.paradisehell.permission.terminator.processor.SystemAlertWindowPermissionProcessorFactory
-import me.paradisehell.permission.terminator.processor.PermissionProcessor
-import me.paradisehell.permission.terminator.processor.RequestInstallPackagesPermissionProcessorFactory
+import me.paradisehell.permission.terminator.processor.*
 import me.paradisehell.permission.terminator.request.PermissionRequestBuilder
 
 /**
@@ -90,6 +87,7 @@ class PermissionTerminator {
             mutableListOf<PermissionProcessor.Factory<*>>(
                 SystemAlertWindowPermissionProcessorFactory(),
                 RequestInstallPackagesPermissionProcessorFactory(),
+                AccessNotificationPolicyPermissionProcessorFactory(),
                 FallbackPermissionProcessorFactory()
             )
 

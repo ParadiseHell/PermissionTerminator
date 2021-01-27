@@ -15,13 +15,13 @@
  */
 package me.paradisehell.permission.terminator
 
-import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
-import android.Manifest.permission.SYSTEM_ALERT_WINDOW
+import android.Manifest.permission.*
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import android.provider.Settings
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 
 
@@ -56,6 +56,9 @@ internal class PermissionUtils {
                         true
                     }
                 }
+                ACCESS_NOTIFICATION_POLICY -> {
+                    return NotificationManagerCompat.from(context).areNotificationsEnabled()
+                }
             }
             return ContextCompat.checkSelfPermission(context, permission) == PERMISSION_GRANTED
         }
@@ -77,7 +80,8 @@ internal class PermissionUtils {
             // check special permission first
             when (permission) {
                 SYSTEM_ALERT_WINDOW,
-                REQUEST_INSTALL_PACKAGES -> {
+                REQUEST_INSTALL_PACKAGES,
+                ACCESS_NOTIFICATION_POLICY -> {
                     return true
                 }
             }
