@@ -17,12 +17,6 @@ package me.paradisehell.permission.terminator.processor
 
 import android.Manifest.permission.SYSTEM_ALERT_WINDOW
 import android.content.Intent
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import me.paradisehell.permission.terminator.IntentUtils
-import me.paradisehell.permission.terminator.PermissionUtils
 
 
 /**
@@ -34,38 +28,9 @@ class SystemAlertWindowPermissionProcessorFactory : PermissionProcessor.Factory<
 
     override fun create() = OverlayPermissionProcessor()
 
-    inner class OverlayPermissionProcessor : PermissionProcessor<Intent> {
-        override fun createLauncher(
-            fragment: Fragment,
-            callback: PermissionProcessor.Callback
-        ): ActivityResultLauncher<Intent> {
-            return fragment.registerForActivityResult(
-                ActivityResultContracts.StartActivityForResult()
-            ) {
-                // Do not need to check ActivityResult, Because it may get a Activity.RESULT_CANCEL
-                // resultCode
-
-                // Check if fragment is recycled
-                val activity = fragment.activity ?: return@registerForActivityResult
-                // just check whether permission is granted or not
-                if (PermissionUtils.isPermissionGranted(activity, SYSTEM_ALERT_WINDOW)) {
-                    callback.onGranted()
-                } else {
-                    callback.onDenied()
-                }
-            }
-        }
-
-        override fun canProcessPermission(permission: String): Boolean {
-            return permission == SYSTEM_ALERT_WINDOW
-        }
-
-        override fun requestPermission(
-            activity: FragmentActivity,
-            launcher: ActivityResultLauncher<Intent>,
-            permission: String
-        ) {
-            launcher.launch(IntentUtils.getPermissionIntent(activity, SYSTEM_ALERT_WINDOW))
+    inner class OverlayPermissionProcessor : AbstractStartActivityForResultPermissionProcessor() {
+        override fun getPermission(): String? {
+            return SYSTEM_ALERT_WINDOW
         }
     }
 }

@@ -18,12 +18,6 @@ package me.paradisehell.permission.terminator.processor
 import android.Manifest.permission.ACCESS_NOTIFICATION_POLICY
 import android.content.Intent
 import android.os.Build
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import me.paradisehell.permission.terminator.IntentUtils
-import me.paradisehell.permission.terminator.PermissionUtils
 
 
 /**
@@ -32,45 +26,16 @@ import me.paradisehell.permission.terminator.PermissionUtils
  * @author Tao Cheng (tao@paradisehell.org)
  */
 class AccessNotificationPolicyPermissionProcessorFactory : PermissionProcessor.Factory<Intent> {
+
     override fun create() = NotificationServicePermissionProcessor()
 
-    inner class NotificationServicePermissionProcessor : PermissionProcessor<Intent> {
-        override fun createLauncher(
-            fragment: Fragment,
-            callback: PermissionProcessor.Callback
-        ): ActivityResultLauncher<Intent> {
-            return fragment.registerForActivityResult(
-                ActivityResultContracts.StartActivityForResult()
-            ) {
-                fragment.context ?: return@registerForActivityResult
-                if (PermissionUtils.isPermissionGranted(
-                        fragment.requireContext(), ACCESS_NOTIFICATION_POLICY
-                    )
-                ) {
-                    callback.onGranted()
-                } else {
-                    callback.onDenied()
-                }
-            }
-        }
-
-        override fun canProcessPermission(permission: String): Boolean {
+    inner class NotificationServicePermissionProcessor :
+        AbstractStartActivityForResultPermissionProcessor() {
+        override fun getPermission(): String? {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                permission == ACCESS_NOTIFICATION_POLICY
+                ACCESS_NOTIFICATION_POLICY
             } else {
-                false
-            }
-        }
-
-        override fun requestPermission(
-            activity: FragmentActivity,
-            launcher: ActivityResultLauncher<Intent>,
-            permission: String
-        ) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                launcher.launch(
-                    IntentUtils.getPermissionIntent(activity, ACCESS_NOTIFICATION_POLICY)
-                )
+                null
             }
         }
     }
