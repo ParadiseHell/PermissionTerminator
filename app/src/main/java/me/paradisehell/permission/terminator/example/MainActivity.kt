@@ -21,7 +21,8 @@ class MainActivity : AppCompatActivity() {
                 .permissions(
                     Manifest.permission.RECORD_AUDIO,
                     Manifest.permission.SYSTEM_ALERT_WINDOW,
-                    Manifest.permission.REQUEST_INSTALL_PACKAGES
+                    Manifest.permission.REQUEST_INSTALL_PACKAGES,
+                    Manifest.permission.ACCESS_NOTIFICATION_POLICY,
                 )
                 .request(
                     onGranted = {
