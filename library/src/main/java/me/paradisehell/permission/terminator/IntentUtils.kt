@@ -55,6 +55,14 @@ internal class IntentUtils {
                         }
                     }
                 }
+                WRITE_SETTINGS -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        intent = Intent(
+                            Settings.ACTION_MANAGE_WRITE_SETTINGS,
+                            Uri.parse("package:${context.packageName}")
+                        )
+                    }
+                }
             }
             if (intent != null && isIntentValid(intent, context)) {
                 return intent

@@ -59,6 +59,13 @@ internal class PermissionUtils {
                 ACCESS_NOTIFICATION_POLICY -> {
                     return NotificationManagerCompat.from(context).areNotificationsEnabled()
                 }
+                WRITE_SETTINGS -> {
+                    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        Settings.System.canWrite(context)
+                    } else {
+                        true
+                    }
+                }
             }
             return ContextCompat.checkSelfPermission(context, permission) == PERMISSION_GRANTED
         }
@@ -81,7 +88,8 @@ internal class PermissionUtils {
             when (permission) {
                 SYSTEM_ALERT_WINDOW,
                 REQUEST_INSTALL_PACKAGES,
-                ACCESS_NOTIFICATION_POLICY -> {
+                ACCESS_NOTIFICATION_POLICY,
+                WRITE_SETTINGS -> {
                     return true
                 }
             }

@@ -88,6 +88,7 @@ class PermissionTerminator {
                 SystemAlertWindowPermissionProcessorFactory(),
                 RequestInstallPackagesPermissionProcessorFactory(),
                 AccessNotificationPolicyPermissionProcessorFactory(),
+                WriteSettingPermissionProcessorFactory(),
                 FallbackPermissionProcessorFactory()
             )
 
