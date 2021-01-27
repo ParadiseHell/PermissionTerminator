@@ -18,12 +18,6 @@ package me.paradisehell.permission.terminator.processor
 import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.content.Intent
 import android.os.Build
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import me.paradisehell.permission.terminator.IntentUtils
-import me.paradisehell.permission.terminator.PermissionUtils
 
 
 /**
@@ -35,42 +29,14 @@ class RequestInstallPackagesPermissionProcessorFactory : PermissionProcessor.Fac
 
     override fun create() = RequestInstallPackagesPermissionProcessor()
 
-    inner class RequestInstallPackagesPermissionProcessor : PermissionProcessor<Intent> {
-        override fun createLauncher(
-            fragment: Fragment,
-            callback: PermissionProcessor.Callback
-        ): ActivityResultLauncher<Intent> {
-            return fragment.registerForActivityResult(
-                ActivityResultContracts.StartActivityForResult()
-            ) {
-                fragment.context ?: return@registerForActivityResult
-                if (PermissionUtils.isPermissionGranted(
-                        fragment.requireContext(),
-                        REQUEST_INSTALL_PACKAGES
-                    )
-                ) {
-                    callback.onGranted()
-                } else {
-                    callback.onDenied()
-                }
-            }
-        }
+    inner class RequestInstallPackagesPermissionProcessor :
+        AbstractStartActivityForResultPermissionProcessor() {
 
-        override fun canProcessPermission(permission: String): Boolean {
+        override fun getPermission(): String? {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                permission == REQUEST_INSTALL_PACKAGES
+                REQUEST_INSTALL_PACKAGES
             } else {
-                false
-            }
-        }
-
-        override fun requestPermission(
-            activity: FragmentActivity,
-            launcher: ActivityResultLauncher<Intent>,
-            permission: String
-        ) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                launcher.launch(IntentUtils.getPermissionIntent(activity, REQUEST_INSTALL_PACKAGES))
+                null
             }
         }
     }

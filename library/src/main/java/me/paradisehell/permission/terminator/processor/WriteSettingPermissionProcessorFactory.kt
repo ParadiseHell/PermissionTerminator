@@ -17,12 +17,6 @@ package me.paradisehell.permission.terminator.processor
 
 import android.Manifest.permission.WRITE_SETTINGS
 import android.content.Intent
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import me.paradisehell.permission.terminator.IntentUtils
-import me.paradisehell.permission.terminator.PermissionUtils
 
 
 /**
@@ -34,37 +28,11 @@ class WriteSettingPermissionProcessorFactory : PermissionProcessor.Factory<Inten
 
     override fun create() = WriteSettingPermissionProcessor()
 
-    inner class WriteSettingPermissionProcessor : PermissionProcessor<Intent> {
-        override fun createLauncher(
-            fragment: Fragment,
-            callback: PermissionProcessor.Callback
-        ): ActivityResultLauncher<Intent> {
-            return fragment.registerForActivityResult(
-                ActivityResultContracts.StartActivityForResult()
-            ) {
-                fragment.context ?: return@registerForActivityResult
-                if (PermissionUtils.isPermissionGranted(
-                        fragment.requireContext(),
-                        WRITE_SETTINGS
-                    )
-                ) {
-                    callback.onGranted()
-                } else {
-                    callback.onDenied()
-                }
-            }
-        }
+    inner class WriteSettingPermissionProcessor :
+        AbstractStartActivityForResultPermissionProcessor() {
 
-        override fun canProcessPermission(permission: String): Boolean {
-            return permission == WRITE_SETTINGS
-        }
-
-        override fun requestPermission(
-            activity: FragmentActivity,
-            launcher: ActivityResultLauncher<Intent>,
-            permission: String
-        ) {
-            launcher.launch(IntentUtils.getPermissionIntent(activity, WRITE_SETTINGS))
+        override fun getPermission(): String? {
+            return WRITE_SETTINGS
         }
     }
 }
