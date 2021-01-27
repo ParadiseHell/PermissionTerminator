@@ -89,6 +89,7 @@ class PermissionTerminator {
                 RequestInstallPackagesPermissionProcessorFactory(),
                 AccessNotificationPolicyPermissionProcessorFactory(),
                 WriteSettingPermissionProcessorFactory(),
+                ManageExternalStoragePermissionProcessorFactory(),
                 FallbackPermissionProcessorFactory()
             )
 

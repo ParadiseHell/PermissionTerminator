@@ -42,7 +42,7 @@ internal class IntentUtils {
                 }
                 SYSTEM_ALERT_WINDOW -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        Intent(
+                        intent = Intent(
                             Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                             Uri.parse("package:${context.packageName}")
                         )
@@ -50,7 +50,7 @@ internal class IntentUtils {
                 }
                 ACCESS_NOTIFICATION_POLICY -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                        intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
                             putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
                         }
                     }
@@ -59,6 +59,14 @@ internal class IntentUtils {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         intent = Intent(
                             Settings.ACTION_MANAGE_WRITE_SETTINGS,
+                            Uri.parse("package:${context.packageName}")
+                        )
+                    }
+                }
+                MANAGE_EXTERNAL_STORAGE -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        intent = Intent(
+                            Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
                             Uri.parse("package:${context.packageName}")
                         )
                     }
