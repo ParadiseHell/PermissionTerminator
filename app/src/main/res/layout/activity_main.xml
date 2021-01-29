@@ -3,13 +3,68 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/button_audio"
+        android:id="@+id/button_normal_permission"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Audio, AlertWindow"
+        android:layout_marginBottom="16dp"
+        android:text="Normal Permission"
+        android:textAllCaps="false"
+        tools:ignore="ButtonStyle,HardcodedText" />
+
+    <Button
+        android:id="@+id/button_access_notification_policy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="ACCESS_NOTIFICATION_POLICY"
+        android:textAllCaps="false"
+        tools:ignore="ButtonStyle,HardcodedText" />
+
+    <Button
+        android:id="@+id/button_manage_external_storage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="MANAGE_EXTERNAL_STORAGE"
+        android:textAllCaps="false"
+        tools:ignore="ButtonStyle,HardcodedText" />
+
+    <Button
+        android:id="@+id/button_request_install_packages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="REQUEST_INSTALL_PACKAGES"
+        android:textAllCaps="false"
+        tools:ignore="ButtonStyle,HardcodedText" />
+
+    <Button
+        android:id="@+id/button_system_alert_window"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="SYSTEM_ALERT_WINDOW"
+        android:textAllCaps="false"
+        tools:ignore="ButtonStyle,HardcodedText" />
+
+    <Button
+        android:id="@+id/button_write_settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="WRITE_SETTINGS"
+        android:textAllCaps="false"
+        tools:ignore="ButtonStyle,HardcodedText" />
+
+    <Button
+        android:id="@+id/button_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="All Permission"
         android:textAllCaps="false"
         tools:ignore="ButtonStyle,HardcodedText" />
 </LinearLayout>
