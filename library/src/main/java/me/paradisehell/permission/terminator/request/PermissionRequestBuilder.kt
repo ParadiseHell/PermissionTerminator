@@ -128,6 +128,7 @@ class PermissionRequestBuilder(private val activity: FragmentActivity?) {
      * @param onDenied called when at least a permission is denied
      * @param onNeverAsked called when at least a permission is never asked
      */
+    @JvmOverloads
     fun request(
         onGranted: (grantedPermissionList: List<String>) -> Unit,
         onDenied: (
