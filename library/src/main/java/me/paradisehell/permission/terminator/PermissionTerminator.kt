@@ -42,6 +42,7 @@ class PermissionTerminator {
          *
          * @param view a [View]
          */
+        @JvmStatic
         fun with(view: View?): PermissionRequestBuilder {
             return with(view?.context)
         }
@@ -51,6 +52,7 @@ class PermissionTerminator {
          *
          * @param fragment a [Fragment]
          */
+        @JvmStatic
         fun with(fragment: Fragment?): PermissionRequestBuilder {
             return with(fragment?.context)
         }
@@ -60,6 +62,7 @@ class PermissionTerminator {
          *
          * @param activity an [Activity]
          */
+        @JvmStatic
         fun with(activity: Activity?): PermissionRequestBuilder {
             return with(activity as? Context)
         }
@@ -69,6 +72,7 @@ class PermissionTerminator {
          *
          * @param context a [Context]
          */
+        @JvmStatic
         fun with(context: Context?): PermissionRequestBuilder {
             if (context == null) {
                 return PermissionRequestBuilder.INVALID
@@ -106,6 +110,7 @@ class PermissionTerminator {
          *
          * @param factory a [PermissionProcessor.Factory]
          */
+        @JvmStatic
         fun addPermissionProcessorFactory(factory: PermissionProcessor.Factory<*>) {
             permissionProcessorFactories.add(factory)
         }
@@ -137,6 +142,7 @@ class PermissionTerminator {
          *
          * @throws [IllegalArgumentException] when add a same [factoryType]
          */
+        @JvmStatic
         fun addRationalBehaviorFactory(
             factoryType: Int,
             factory: PermissionRationalBehavior.Factory
@@ -154,6 +160,7 @@ class PermissionTerminator {
         /**
          * Set a default [PermissionRationalBehavior.Factory] to handle Rational situation
          */
+        @JvmStatic
         fun setDefaultRationalBehaviorFactoryType(factoryType: Int) {
             defaultRationalType = factoryType
         }
@@ -189,6 +196,7 @@ class PermissionTerminator {
          *
          * @throws [IllegalArgumentException] when add a same [factoryType]
          */
+        @JvmStatic
         fun addDenialBehaviorFactory(factoryType: Int, factory: PermissionDenialBehavior.Factory) {
             val oldFactory = denialFactories[factoryType]
             if (oldFactory != null) {
@@ -203,6 +211,7 @@ class PermissionTerminator {
         /**
          * Set a default [PermissionDenialBehavior.Factory] to handle Denial situation
          */
+        @JvmStatic
         fun setDefaultDenialBehaviorFactoryType(factoryType: Int) {
             defaultDenialType = factoryType
         }
@@ -239,6 +248,7 @@ class PermissionTerminator {
          *
          * @throws [IllegalArgumentException] when add a same [factoryType]
          */
+        @JvmStatic
         fun addNeverAskBehaviorFactory(
             factoryType: Int,
             factory: PermissionNeverAskBehavior.Factory
@@ -258,6 +268,7 @@ class PermissionTerminator {
          *
          * @param factoryType the type of [PermissionNeverAskBehavior.Factory]
          */
+        @JvmStatic
         fun setDefaultNeverAskBehaviorFactoryType(factoryType: Int) {
             defaultNeverAskType = factoryType
         }
