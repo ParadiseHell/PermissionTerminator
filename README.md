@@ -43,26 +43,6 @@ PermissionTerminator
 	)
 ```
 
-## Why to make a same wheel?
-
-As you know, you can find lots of Android Permission Library on github, like
-[XXPermissions](https://github.com/getActivity/XXPermissions),
-[RxPermissions](https://github.com/tbruyelle/RxPermissions),
-[PermissionsDispatcher](https://github.com/permissions-dispatcher/PermissionsDispatcher)
-and so on. But why do I decide to make a new one? Not because they do not work,
-at least they work better than `PermissionTerminator` now. I just think they are
-not scalable, especially `PermissionsDispatcher` you don't even know how to have
-a secondary encapsulation.
-
-So a open source libray must be scalable, so user can do some meaningful things
-base one it, so `PermissionTerminator` does. You can write your own **Behavior**
-to handle different situations and you can write your own **Processor** to handle
-different permissions (`PermissionTerminator` has done a lot, but you can still
-override and add your custom implemetions) without change the source code.
-
-Hope `PermissionTerminator` will give you some other ideas about writing a open
-source library.
-
 ## Detail API
 
 See the [wiki](https://github.com/ParadiseHell/PermissionTerminator/wiki).
