@@ -25,7 +25,7 @@ Enjoy yourself :
 
 ```kotlin
 PermissionTerminator
-	.with(this /*View, Fragment or Actiivty*/ )
+	.with(this /*View, Fragment, Actiivty, Context*/ )
 	.permissions(
 		Manifest.permission.RECORD_AUDIO
 		// add more permissions
