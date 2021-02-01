@@ -17,7 +17,7 @@ allprojects {
 Add the dependency :
 ```
 dependencies {
-	implementation 'com.github.ParadiseHell:PermissionTerminator:0.0.1'
+	implementation 'com.github.ParadiseHell:PermissionTerminator:0.0.2'
 }
 ```
 
