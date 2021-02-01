@@ -47,7 +47,7 @@ PermissionTerminator
 
 See the [wiki](https://github.com/ParadiseHell/PermissionTerminator/wiki).
 
-## DOTO
+## TODO
 
 - [ ] Adapt Android 8.0 .
 - [ ] Adapt Android 9.0 .
