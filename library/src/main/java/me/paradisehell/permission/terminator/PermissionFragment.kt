@@ -15,7 +15,11 @@
  */
 package me.paradisehell.permission.terminator
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
@@ -56,7 +60,41 @@ internal class PermissionFragment : Fragment() {
      */
     private var canProcessRequestDirectly = false
 
+    /**
+     * a value to store current activity screen orientation, which is used to restore current
+     * activity's orientation if current activity's orientation is set force.
+     */
+    private var originalScreenOrientation = Int.MIN_VALUE
+
     // Lifecycle
+
+    @SuppressLint("SourceLockedOrientationActivity", "SwitchIntDef")
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        activity ?: return
+        // check if current activity has locked orientation
+        originalScreenOrientation = requireActivity().requestedOrientation
+        if (originalScreenOrientation != ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) {
+            return
+        }
+        // get orientation from resources and lock current activity's orientation
+        when (resources.configuration.orientation) {
+            Configuration.ORIENTATION_LANDSCAPE -> {
+                requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            }
+            Configuration.ORIENTATION_PORTRAIT -> {
+                requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        activity ?: return
+        if (originalScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) {
+            requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
