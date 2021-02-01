@@ -54,7 +54,6 @@ See the [wiki](https://github.com/ParadiseHell/PermissionTerminator/wiki).
 - [ ] Adapt Android 10.0 .
 - [ ] Adapt Android 11.0 .
 - [ ] Adapt some special permissions more robustly.
-- [ ] Adapt screen rotaion.
 
 
 ## License
