@@ -55,6 +55,10 @@ See the [wiki](https://github.com/ParadiseHell/PermissionTerminator/wiki).
 - [ ] Adapt Android 11.0 .
 - [ ] Adapt some special permissions more robustly.
 
+## Thanks
+
+- [XXPermissions](https://github.com/getActivity/XXPermissions)
+
 
 ## License
 
