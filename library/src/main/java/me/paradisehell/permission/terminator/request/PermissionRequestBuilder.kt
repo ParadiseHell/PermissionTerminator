@@ -15,6 +15,7 @@
  */
 package me.paradisehell.permission.terminator.request
 
+import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import me.paradisehell.permission.terminator.PermissionCallback
 import me.paradisehell.permission.terminator.PermissionTerminator
@@ -31,6 +32,7 @@ import java.util.*
 class PermissionRequestBuilder(private val activity: FragmentActivity?) {
 
     private val permissionList = LinkedList<String>()
+    private val permissionSet = mutableSetOf<String>()
     private var rationalType: Int? = null
     private var disableRational = false
     private var denialType: Int? = null
@@ -42,18 +44,28 @@ class PermissionRequestBuilder(private val activity: FragmentActivity?) {
     /**
      * Add permissions to this request
      *
-     * @param permission a permissions
      * @param permissions an array of permissions
      */
-    fun permissions(permission: String, vararg permissions: String) = apply {
-        val permissionSet = mutableSetOf<String>()
-        permissionList.add(permission)
-        permissionSet.add(permission)
-        permissions.forEach { p ->
-            if (permissionSet.contains(p).not()) {
-                permissionList.add(p)
-                permissionSet.add(p)
+    fun permissions(vararg permissions: String) = apply {
+        permissions.forEach { permission ->
+            if (permissionSet.contains(permission).not()) {
+                permissionList.add(permission)
             }
+            permissionSet.add(permission)
+        }
+    }
+
+    /**
+     * Add permissions to this request
+     *
+     * @param permissions a list of permissions
+     */
+    fun permissions(permissions: List<String>) = apply {
+        permissions.forEach { permission ->
+            if (permissionSet.contains(permission).not()) {
+                permissionList.add(permission)
+            }
+            permissionSet.add(permission)
         }
     }
 
@@ -171,11 +183,15 @@ class PermissionRequestBuilder(private val activity: FragmentActivity?) {
         if (activity == null) {
             return null
         }
-        // check permission
+        // check is permission is empty
         if (permissionList.isEmpty()) {
-            throw RuntimeException(
-                "Please call PermissionRequestBuilder#permisssions method fist !!!"
+            Log.w(
+                PermissionTerminator.TAG,
+                "No permission is added!!!" +
+                        "please call PermissionRequestBuilder#permissions() method " +
+                        "before call PermissionRequestBuilder#request()"
             )
+            return null
         }
         // check behavior
         val rational = if (disableRational) {
