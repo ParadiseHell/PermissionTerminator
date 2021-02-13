@@ -35,6 +35,8 @@ import me.paradisehell.permission.terminator.request.PermissionRequestBuilder
  */
 class PermissionTerminator {
     companion object {
+        internal const val TAG = "PermissionTerminator"
+
         // obtain PermissionRequestBuilder
 
         /**

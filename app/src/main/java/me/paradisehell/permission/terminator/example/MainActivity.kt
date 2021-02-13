@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, PermissionCallba
             }
             R.id.button_all -> {
                 val permissionList = mutableListOf(
+                    Manifest.permission.RECORD_AUDIO,
                     Manifest.permission.READ_CONTACTS,
                     Manifest.permission.READ_CALENDAR,
                     Manifest.permission.SYSTEM_ALERT_WINDOW,
@@ -89,10 +90,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, PermissionCallba
                 }
                 PermissionTerminator
                     .with(this)
-                    .permissions(
-                        Manifest.permission.RECORD_AUDIO,
-                        permissions = permissionList.toTypedArray()
-                    )
+                    .permissions(permissionList)
                     .request(this)
             }
         }
